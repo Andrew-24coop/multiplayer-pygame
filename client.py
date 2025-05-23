@@ -1,12 +1,11 @@
 import socket
 import threading
 
-IP = '192.168.1.64'
+IP = '192.168.1.74'
 PORT = 6969
 
 client = socket.socket(socket.AF_INET, socket.SOCK_DGRAM)
 
-# Optional: bind to any available port to receive messages
 client.bind(('0.0.0.0', 0))
 print(f"Client running on {client.getsockname()}")
 
