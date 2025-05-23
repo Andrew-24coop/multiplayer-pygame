@@ -4,8 +4,6 @@ import threading
 IP = '192.168.1.64'
 PORT = 6969
 
-USE_AUTOCONNECT = False
-
 client = socket.socket(socket.AF_INET, socket.SOCK_DGRAM)
 
 # Optional: bind to any available port to receive messages
@@ -24,10 +22,6 @@ def receive_messages():
         try:
             message, addr = client.recvfrom(1024)
             print(message.decode('utf-8'))
-
-            if addr == server_address and not connected and USE_AUTOCONNECT:
-                print("[System] Connected to server.")
-                connected = True
 
         except socket.timeout:
             continue
