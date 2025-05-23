@@ -4,30 +4,55 @@ import threading
 IP = '192.168.1.64'
 PORT = 6969
 
+USE_AUTOCONNECT = False
+
 client = socket.socket(socket.AF_INET, socket.SOCK_DGRAM)
 
-client.connect((IP, PORT))
+# Optional: bind to any available port to receive messages
+client.bind(('0.0.0.0', 0))
+print(f"Client running on {client.getsockname()}")
+
+client.settimeout(5)
+
+server_address = (IP, PORT)
+connected = False
 
 
 def receive_messages():
+    global connected
     while True:
         try:
-            message, _ = client.recvfrom(1024)
+            message, addr = client.recvfrom(1024)
             print(message.decode('utf-8'))
+
+            if addr == server_address and not connected and USE_AUTOCONNECT:
+                print("[System] Connected to server.")
+                connected = True
+
+        except socket.timeout:
+            continue
         except Exception as e:
             print("Error receiving message:", e)
             break
 
 
 def send_messages():
+    global connected
     while True:
         message = input("")
-        if message.strip().lower() == "/disconnect":
-            client.send(message.encode('utf-8'))
+        if message.strip().lower() == "/connect":
+            client.connect(server_address)
+            print("Connected to server.")
+            connected = True
+            client.send("/connect".encode('utf-8'))
+        elif message.strip().lower() == "/disconnect":
+            connected = False
+            client.send("/disconnect".encode('utf-8'))
             print("You have been disconnected.")
-            break
-        else:
+        elif connected:
             client.send(message.encode('utf-8'))
+        else:
+            print("You must connect first using /connect")
 
 
 threading.Thread(target=receive_messages).start()
