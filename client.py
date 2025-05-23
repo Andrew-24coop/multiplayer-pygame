@@ -16,7 +16,6 @@ connected = False
 
 
 def receive_messages():
-    global connected
     while True:
         try:
             message, addr = client.recvfrom(1024)
