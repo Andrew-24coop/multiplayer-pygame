@@ -12,7 +12,6 @@ print(f"Client running on {client.getsockname()}")
 client.settimeout(5)
 
 server_address = (IP, PORT)
-connected = False
 
 
 def receive_messages():
@@ -29,7 +28,7 @@ def receive_messages():
 
 
 def send_messages():
-    global connected
+    connected = False
     while True:
         message = input("")
         if message.strip().lower() == "/connect":
