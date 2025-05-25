@@ -1,7 +1,7 @@
 import socket
 import threading
 
-IP = '192.168.1.74'
+IP = '10.0.5.74'
 PORT = 6969
 
 client = socket.socket(socket.AF_INET, socket.SOCK_DGRAM)
