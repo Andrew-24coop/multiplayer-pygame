@@ -1,136 +1,87 @@
 import pygame
+import sys
 from settings import *
 
 pygame.init()
-
+sc = pygame.display.set_mode(SIZE)
 clock = pygame.time.Clock()
-screen = pygame.display.set_mode(SIZE, pygame.FULLSCREEN)
 pygame.display.set_caption("Window")
 
-font = pygame.font.SysFont(None, 60)
+main_menu_bg_img = pygame.image.load('assets/img/main_menu_bg.png').convert()
+main_menu_bg_img = pygame.transform.scale(main_menu_bg_img, SIZE)
+credits_bg_img = pygame.image.load('assets/img/credits_bg_img.png').convert()
+credits_bg_img = pygame.transform.scale(credits_bg_img, SIZE)
 
-current_width, current_height = WIDTH, HEIGHT
-is_fullscreen = True
-
-
-def draw_text(text, color, rect, center=True):
-    text_surf = font.render(text, True, color)
-    if center:
-        screen.blit(text_surf, text_surf.get_rect(center=rect.center))
-    else:
-        screen.blit(text_surf, rect)
+menu_font = pygame.font.Font("assets/fonts/main_menu_font.ttf", 65)
 
 
-def draw_button(rect, text, selected=False):
-    color = RED if selected else BLACK
-    pygame.draw.rect(screen, WHITE, rect)
-    pygame.draw.rect(screen, color, rect, 3)
-    draw_text(text, color, rect)
-
-
-def main_menu():
-    menu_options = ["New Game", "Settings"]
-    selected_index = 0
-    in_menu = True
-
-    while in_menu:
-        screen.fill(WHITE)
-        rects = []
-
+def show_credits():
+    while True:
+        sc.blit(credits_bg_img, (0, 0))
+        
         for event in pygame.event.get():
             if event.type == pygame.QUIT:
                 pygame.quit()
-                exit()
-            elif event.type == pygame.KEYDOWN:
-                if event.key == pygame.K_DOWN:
-                    selected_index = (selected_index + 1) % len(menu_options)
-                elif event.key == pygame.K_UP:
-                    selected_index = (selected_index - 1) % len(menu_options)
-                elif event.key == pygame.K_RETURN:
-                    if selected_index == 0:
-                        in_menu = False
-                    elif selected_index == 1:
-                        settings_menu()
-            elif event.type == pygame.MOUSEMOTION:
-                mx, my = pygame.mouse.get_pos()
-                for i, opt in enumerate(menu_options):
-                    rect = pygame.Rect(current_width // 2 - 150, current_height // 2 - 40 + i * 80, 300, 60)
-                    if rect.collidepoint(mx, my):
-                        selected_index = i
-            elif event.type == pygame.MOUSEBUTTONDOWN:
-                mx, my = pygame.mouse.get_pos()
-                for i, opt in enumerate(menu_options):
-                    rect = pygame.Rect(current_width // 2 - 150, current_height // 2 - 40 + i * 80, 300, 60)
-                    if rect.collidepoint(mx, my):
-                        if i == 0:
-                            in_menu = False
-                        elif i == 1:
-                            settings_menu()
-
-        for i, opt in enumerate(menu_options):
-            rect = pygame.Rect(current_width // 2 - 150, current_height // 2 - 40 + i * 80, 300, 60)
-            draw_button(rect, opt, selected=i == selected_index)
-            rects.append(rect)
-
+                sys.exit()
+ 
         pygame.display.flip()
         clock.tick(FPS)
 
 
-def settings_menu():
-    global is_fullscreen, screen
-    
-    setting_x = 200
-    option_x = current_width - 300
-    row_y = current_height // 2 - 60
-    spacing = 100
-
-    in_settings = True
-
-    while in_settings:
-        screen.fill(WHITE)
-
-        fullscreen_rect = pygame.Rect(option_x, row_y, 120, 50)
-
+def new_game():
+    sc.fill(GREEN)
+    while True:
         for event in pygame.event.get():
             if event.type == pygame.QUIT:
                 pygame.quit()
-                exit()
-            elif event.type == pygame.KEYDOWN:
-                if event.key == pygame.K_ESCAPE:
-                    in_settings = False
-            elif event.type == pygame.MOUSEBUTTONDOWN:
-                mx, my = pygame.mouse.get_pos()
-                if fullscreen_rect.collidepoint(mx, my):
-                    toggle_fullscreen()
-
-        draw_text("Fullscreen", BLACK, pygame.Rect(setting_x, row_y, 200, 50), center=False)
-
-        pygame.draw.rect(screen, BLACK, fullscreen_rect, 3)
-        pygame.draw.rect(screen, GREEN if is_fullscreen else RED, fullscreen_rect.inflate(-10, -10))
-        toggle_text = "On" if is_fullscreen else "Off"
-        draw_text(toggle_text, BLACK, fullscreen_rect)
+                sys.exit()
 
         pygame.display.flip()
         clock.tick(FPS)
-
-
-def toggle_fullscreen():
-    global is_fullscreen, screen
-    is_fullscreen = not is_fullscreen
-    screen = pygame.display.set_mode((current_width, current_height), pygame.FULLSCREEN if is_fullscreen else 0)
-
 
 def main():
-    main_menu()
-    running = True
-    while running:
+    while True:
+        # sc.blit(main_menu_bg_img, (0, 0))
+        
+        new_game_button = menu_font.render("New Game", False, WHITE)
+        continue_button = menu_font.render("Continue", False, GRAY)
+        settings_button = menu_font.render("Settings", False, WHITE)
+        credits_button = menu_font.render("Credits", False, WHITE)
+        exit_button = menu_font.render("Exit", False, WHITE)
+
+        new_game_rect = new_game_button.get_rect(center=(SIZE[0] // 2, SIZE[1] // 2 - 150))
+        continue_rect = continue_button.get_rect(center=(SIZE[0] // 2, SIZE[1] // 2 - 75))
+        settings_rect = settings_button.get_rect(center=(SIZE[0] // 2, SIZE[1] // 2))
+        credits_rect = credits_button.get_rect(center=(SIZE[0] // 2, SIZE[1] // 2 + 75))
+        exit_rect = exit_button.get_rect(center=(SIZE[0] // 2, SIZE[1] // 2 + 150))
+
+        sc.blit(new_game_button, new_game_rect)
+        sc.blit(continue_button, continue_rect)
+        sc.blit(settings_button, settings_rect)
+        sc.blit(credits_button, credits_rect)
+        sc.blit(exit_button, exit_rect)
+
         for event in pygame.event.get():
             if event.type == pygame.QUIT:
-                running = False
-        screen.fill(BLUE)
+                pygame.quit()
+                sys.exit()
+            if event.type == pygame.MOUSEBUTTONDOWN:
+                if new_game_rect.collidepoint(event.pos):
+                    new_game()
+                if continue_rect.collidepoint(event.pos):
+                    continue
+                if settings_rect.collidepoint(event.pos):
+                    continue
+                if credits_rect.collidepoint(event.pos):
+                    show_credits()
+                if exit_rect.collidepoint(event.pos):
+                    pygame.quit()
+                    sys.exit()
+
         pygame.display.flip()
         clock.tick(FPS)
 
 
 if __name__ == "__main__":
     main()
+
